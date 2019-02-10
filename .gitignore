@@ -62,3 +62,4 @@ typings/
 
 # py cache
 __pycache__
+test.csv
