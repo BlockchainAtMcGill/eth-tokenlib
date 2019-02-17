@@ -1,6 +1,9 @@
 import requests
 import json
 import csv
+import os
+
+
 
 url = 'https://jsonplaceholder.typicode.com/posts/1'
 response = requests.get('https://jsonplaceholder.typicode.com/posts/1')
