@@ -3,21 +3,53 @@ import json
 import csv
 import os
 
+days_ms = 86400000
+num_call = 1483228800000
 
+# Some sample time values
+call_time = '1483228800000' #00:00:00 at 01/01/2017 in millisecond epoch (GMT/UTC)
+call_end = '1483250400000'
 
-url = 'https://jsonplaceholder.typicode.com/posts/1'
-response = requests.get('https://jsonplaceholder.typicode.com/posts/1')
+end = num_call + hours_ms
 
-text = response.text
+coincap_url = 'http://api.coincap.io/v2/candles'
+coincap_params = {
+'exchange':'bitfinex',
+'interval':'m1',
+# Note: pair is reversed, meaning that base pair USD means quoteId instead and vice versa
+'baseId':'bitcoin', 'quoteId':'united-states-dollar'
+,'start': num_call,
+'end': end
+}
 
-jsondata = json.loads(text)
+nomics_url = 'https://api.nomics.com/v1/exchange_candles'
 
+# API Key is saved as environment variable
+# On Powershell(Windows) its $env:VarName = "value"
+nomics_key = os.environ.get('nomics') 
+nomics_params = {
+'key': nomics_key,
+'interval':'1m',
+'exchange':'binance',
+'market':'BTCUSDT'
+# ,'start':'',
+# 'end':''
+}
+
+coincap_data = requests.get(coincap_url, coincap_params)
+# nomics_data = requests.get(nomics_url, nomics_params)
+
+coincap_json = json.loads(coincap_data.text)
+coincap_ohlcv = coincap_json['data']
 if __name__ == "__main__":
-	jsondata['title']
-	
-	with open('test.csv','w') as csvfile:
-		fieldnames = ['title','body']
+	# Similar code used for nomics
+	with open('coincap_ex.csv', 'w') as csvfile:
+		fieldnames = coincap_ohlcv[0].keys()
 		writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 		writer.writeheader()
-		writer.writerow({'title': jsondata['title'], 'body': jsondata['body']})
+		for i in range (0,len(coincap_ohlcv)):
+			writer.writerow(coincap_ohlcv[i])
+	
+	
 	print('Completed')
+	
